@@ -8,12 +8,8 @@ const homeServices = {
       },
     });
   },
-  getColor(type) {
-    return https.get("/api/get-color-product", {
-      params: {
-        type: type,
-      },
-    });
+  getColor() {
+    return https.get("/api/get-color-product");
   },
 };
 

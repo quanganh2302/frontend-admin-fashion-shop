@@ -8,13 +8,15 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchColor } from "../../store/Home/thunk";
-import { createColorTable, createNewProduct } from "../../store/Product/thunk";
+import { createNewProduct, fetchProduct } from "../../store/Product/thunk";
 import clsx from "clsx";
 const AddProduct = () => {
   const dispatch = useDispatch();
   const color = useSelector((state) => state.homeReducer.color);
-  const [colorArr, setColorArr] = useState([]);
-  const [colorInfo, setColorInfo] = useState([]);
+  const products = useSelector((state) => state.productReducer.products);
+  console.log(products);
+  // const [colorArr, setColorArr] = useState([]);
+  // const [colorInfo, setColorInfo] = useState([]);
   // const [productInfo, setProductInfo] = useState({
   //   productNameEn: "",
   //   productId: "",
@@ -37,11 +39,15 @@ const AddProduct = () => {
   useEffect(() => {
     dispatch(fetchColor());
   }, []);
+  // useEffect(() => {
+  //   setColorArr(color);
+  // }, [color]);
 
   useEffect(() => {
-    setColorArr(color);
-  }, [color]);
-  // console.log(color)
+    dispatch(fetchProduct());
+  }, []);
+
+  // Handle Color -----------------------------------------------------------------
   const handleOnChangeColor = (e) => {
     let colors = e.target.value;
     let checkColor = colorSelected.indexOf(colors);
@@ -53,26 +59,34 @@ const AddProduct = () => {
       let data = [...colorSelected];
       data.push(colors);
       setColorSelected(data);
-      setProductInfo({
-        ...productInfo,
-        colorPicked: colorSelected,
-      });
     }
   };
   const printColor = (item) => {
-    let res = color.find(({ keyMap }) => keyMap === item);
+    let res = color.find(({ colorKey }) => colorKey === item);
     return res.value;
   };
 
+  const handleRemoveColor = (data) => {
+    const newColorSelected = colorSelected.filter((item) => item !== data);
+    setColorSelected(newColorSelected);
+  };
+  // Handle Color -----------------------------------------------------------------
+
+  // Handle Product -----------------------------------------------------------------
   const handleOnChangeProduct = (e) => {
     setProductInfo({ ...productInfo, [e.target.name]: e.target.value });
   };
 
   const handleCreateProduct = (e) => {
     e.preventDefault();
-    dispatch(createColorTable(productInfo));
+    // dispatch(createColorTable(productInfo));
+    setProductInfo({
+      ...productInfo,
+      colorPicked: colorSelected,
+    });
     dispatch(createNewProduct(productInfo));
   };
+  // Handle Product -----------------------------------------------------------------
 
   return (
     <div className="">
@@ -176,7 +190,7 @@ const AddProduct = () => {
                   color.length > 0 &&
                   color.map((item, index) => {
                     return (
-                      <option key={index} value={item.keyMap}>
+                      <option key={index} value={item.colorKey}>
                         {item.nameEn}
                       </option>
                     );
@@ -207,6 +221,7 @@ const AddProduct = () => {
                           "tw-w-[15px] tw-h-[15px] tw-border tw-border-black tw-border-solid tw-rounded-[50%] tw-mx-[5px] tw-flex-wrap tw-cursor-pointer"
                         )}
                         style={{ backgroundColor: printColor(item) }}
+                        onClick={() => handleRemoveColor(item)}
                       ></div>
                     );
                   })}
@@ -264,13 +279,22 @@ const AddProduct = () => {
             Submit
           </Button>
         </form>
-        <Table responsive>
+        {/* Display product */}
+        <Table className="tw-mt-[300px] tw-mb-[300px]" responsive>
           <thead>
             <tr>
-              <th>#</th>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <th key={index}>Table heading</th>
-              ))}
+              <th>ID</th>
+              <th>ProductId</th>
+              <th>Product name</th>
+              <th>Quantity</th>
+              <th>Tag</th>
+              <th>Category</th>
+              <th>Color</th>
+              <th>Size</th>
+              <th>Image</th>
+              <th>Description</th>
+              <th>Edit</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -280,21 +304,8 @@ const AddProduct = () => {
                 <td key={index}>Table cell {index}</td>
               ))}
             </tr>
-            <tr>
-              <td>2</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
-            <tr>
-              <td>3</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
           </tbody>
         </Table>
-        <div className="test-tailwind">akjdhasjkdhaskjdha</div>
       </Container>
     </div>
   );

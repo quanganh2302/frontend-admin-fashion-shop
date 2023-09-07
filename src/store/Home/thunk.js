@@ -41,7 +41,7 @@ export const fetchRole = () => async (dispatch) => {
 
 export const fetchColor = () => async (dispatch) => {
   try {
-    let color = await homeServices.getColor("color");
+    let color = await homeServices.getColor();
     dispatch({
       type: actionTypes.FETCH_COLOR,
       payload: color.color,
