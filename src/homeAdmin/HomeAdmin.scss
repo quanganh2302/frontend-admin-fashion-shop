@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  background-color: red;
+  color: white;
+  justify-content: start;
+  align-items: center;
+  padding: 0px 80px;
+  .header-item {
+    padding: 15px;
+    border: 1px solid black;
+    a {
+      color: white;
+      text-decoration: none;
+      text-transform: capitalize;
+    }
+  }
+}
