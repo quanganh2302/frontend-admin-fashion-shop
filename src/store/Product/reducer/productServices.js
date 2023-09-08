@@ -10,6 +10,9 @@ const productServices = {
   handleFetchProduct() {
     return https.get("/api/fetch-product");
   },
+  handleCreateNewColor(data) {
+    return https.post("/api/create-new-color", data);
+  },
 };
 
 export default productServices;

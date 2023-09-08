@@ -4,7 +4,9 @@ const actionTypes = Object.freeze({
   FETCH_ROLE: "FETCH_ROLE",
   FETCH_COLOR: "FETCH_COLOR",
   FETCH_SIZE: "FETCH_SIZE",
-
+  FETCH_TYPE: "FETCH_TYPE",
+  FETCH_CATEGORY: "FETCH_CATEGORY",
+  FETCH_TAG_PRODUCT: "FETCH_TAG_PRODUCT",
 });
 
 export default actionTypes;

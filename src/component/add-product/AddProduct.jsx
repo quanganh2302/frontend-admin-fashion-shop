@@ -7,45 +7,118 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchColor } from "../../store/Home/thunk";
+import {
+  fetchColor,
+  fetchSize,
+  fetchTypeCustomer,
+  fetchCategories,
+  fetchTagProduct,
+} from "../../store/Home/thunk";
 import { createNewProduct, fetchProduct } from "../../store/Product/thunk";
 import clsx from "clsx";
 const AddProduct = () => {
   const dispatch = useDispatch();
   const color = useSelector((state) => state.homeReducer.color);
+  const size = useSelector((state) => state.homeReducer.size);
+  const type = useSelector((state) => state.homeReducer.type);
+  const categories = useSelector((state) => state.homeReducer.categories);
+  const tagProduct = useSelector((state) => state.homeReducer.tagProduct);
   const products = useSelector((state) => state.productReducer.products);
-  console.log(products);
-  // const [colorArr, setColorArr] = useState([]);
-  // const [colorInfo, setColorInfo] = useState([]);
-  // const [productInfo, setProductInfo] = useState({
-  //   productNameEn: "",
-  //   productId: "",
-  //   quantity: "",
-  //   weigh: "",
-  //   image: "",
-  //   desc: "",
-  //   color: "",
-  //   size: "",
-  //   tag: "",
-  //   category: "",
-  // });
+  const productsReverse = [...products].reverse();
   const [productInfo, setProductInfo] = useState({
     productId: "",
     productNameEn: "",
     quantity: "",
+    weigh: "",
+    sizeKeyMap: "",
+    typeKeyMap: "",
+    category: "",
+    tagName: "",
     colorPicked: [],
   });
   const [colorSelected, setColorSelected] = useState([]);
   useEffect(() => {
     dispatch(fetchColor());
-  }, []);
-  // useEffect(() => {
-  //   setColorArr(color);
-  // }, [color]);
-
-  useEffect(() => {
+    dispatch(fetchSize());
+    dispatch(fetchCategories());
+    dispatch(fetchTypeCustomer());
+    dispatch(fetchTagProduct());
     dispatch(fetchProduct());
   }, []);
+
+  // Define default value for type, categories, size and color picked
+  useEffect(() => {
+    if (
+      type &&
+      type.length > 0 &&
+      size &&
+      size.length > 0 &&
+      categories &&
+      categories.length > 0 &&
+      color &&
+      color.length > 0 &&
+      tagProduct &&
+      tagProduct.length > 0
+    ) {
+      setProductInfo({
+        ...productInfo,
+        typeKeyMap: type[0].key,
+        sizeKeyMap: size[0].key,
+        category: categories[0].cateKey,
+        tagName: tagProduct[0].nameEn,
+        colorPicked: colorSelected,
+      });
+    }
+  }, [type, categories, size, color, tagProduct]);
+
+  // Define default value for color selected display
+  useEffect(() => {
+    if (color && color.length > 0) {
+      let colorDefault = color[0].colorKey;
+      let checkColor = colorSelected.indexOf(colorDefault);
+      if (checkColor !== -1) {
+        return;
+      } else {
+        let data = [...colorSelected];
+        data.push(colorDefault);
+        setColorSelected(data);
+      }
+    }
+  }, [color]);
+  // Update state of color picked onchange
+  useEffect(() => {
+    setProductInfo({
+      ...productInfo,
+      colorPicked: colorSelected,
+    });
+  }, [colorSelected]);
+
+  const handleOnChangeSize = (e) => {
+    setProductInfo({
+      ...productInfo,
+      sizeKeyMap: e.target.value,
+    });
+  };
+
+  const handleOnChangeType = (e) => {
+    setProductInfo({
+      ...productInfo,
+      typeKeyMap: e.target.value,
+    });
+  };
+
+  const handleOnChangeCategory = (e) => {
+    setProductInfo({
+      ...productInfo,
+      category: e.target.value,
+    });
+  };
+  const handleOnChangeTagProduct = (e) => {
+    setProductInfo({
+      ...productInfo,
+      tagName: e.target.value,
+    });
+  };
 
   // Handle Color -----------------------------------------------------------------
   const handleOnChangeColor = (e) => {
@@ -61,6 +134,7 @@ const AddProduct = () => {
       setColorSelected(data);
     }
   };
+
   const printColor = (item) => {
     let res = color.find(({ colorKey }) => colorKey === item);
     return res.value;
@@ -78,16 +152,12 @@ const AddProduct = () => {
   };
 
   const handleCreateProduct = (e) => {
-    e.preventDefault();
-    // dispatch(createColorTable(productInfo));
-    setProductInfo({
-      ...productInfo,
-      colorPicked: colorSelected,
-    });
+    // e.preventDefault();
+
     dispatch(createNewProduct(productInfo));
   };
-  // Handle Product -----------------------------------------------------------------
 
+  // Handle Product -----------------------------------------------------------------
   return (
     <div className="">
       {" "}
@@ -103,6 +173,7 @@ const AddProduct = () => {
                   aria-describedby="basic-addon3"
                   name="productNameEn"
                   onChange={handleOnChangeProduct}
+                  value={productInfo.productNameEn}
                 />
               </InputGroup>
             </Col>
@@ -115,6 +186,7 @@ const AddProduct = () => {
                   aria-describedby="basic-addon3"
                   name="productId"
                   onChange={handleOnChangeProduct}
+                  value={productInfo.productId}
                   // pattern="^P[A-Z]{2}\d$"
                   // required
                   // Set up Regular Expressions next time
@@ -132,6 +204,7 @@ const AddProduct = () => {
                   id="basic-url"
                   aria-describedby="basic-addon3"
                   name="quantity"
+                  value={productInfo.quantity}
                   onChange={handleOnChangeProduct}
                 />
               </InputGroup>
@@ -144,7 +217,7 @@ const AddProduct = () => {
                   id="basic-url"
                   aria-describedby="basic-addon3"
                   name="weigh"
-                  disabled
+                  value={productInfo.weigh}
                 />
               </InputGroup>
             </Col>
@@ -230,49 +303,88 @@ const AddProduct = () => {
             </Col>
             <Col>
               {" "}
-              <Form.Label htmlFor="basic-url">size</Form.Label>
-              <InputGroup className="mb-3 ">
-                <Form.Control
-                  id="basic-url"
-                  aria-describedby="basic-addon3"
-                  name="sizeId"
-                  disabled
-                />
-              </InputGroup>
+              {/* size --------------------------------------------------------  */}
+              <Form.Label htmlFor="basic-url">
+                Open this select menu size
+              </Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="color"
+                onChange={handleOnChangeSize}
+              >
+                {size &&
+                  size.length > 0 &&
+                  size.map((item, index) => {
+                    return (
+                      <option key={index} value={item.key}>
+                        {item.key}
+                      </option>
+                    );
+                  })}
+              </Form.Select>
             </Col>
             <Col>
               {" "}
-              <Form.Label htmlFor="basic-url">color</Form.Label>
-              <InputGroup className="mb-3 ">
-                <Form.Control id="basic-url" aria-describedby="basic-addon3" />
-              </InputGroup>
+              {/* type customer -----------------------------------------------------  */}
+              <Form.Label htmlFor="basic-url">
+                Open this select menu type of customer
+              </Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="color"
+                onChange={handleOnChangeType}
+              >
+                {type &&
+                  type.length > 0 &&
+                  type.map((item, index) => {
+                    return (
+                      <option key={index} value={item.key}>
+                        {item.nameEn}
+                      </option>
+                    );
+                  })}
+              </Form.Select>
             </Col>
           </Row>{" "}
           {/* tag and category  */}
           <Row>
             <Col>
               {" "}
-              <Form.Label htmlFor="basic-url">tag</Form.Label>
-              <InputGroup className="mb-3 ">
-                <Form.Control
-                  id="basic-url"
-                  aria-describedby="basic-addon3"
-                  name="tag"
-                  disabled
-                />
-              </InputGroup>
+              <Form.Label htmlFor="basic-url">Open this select menu</Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="color"
+                onChange={handleOnChangeTagProduct}
+              >
+                {tagProduct &&
+                  tagProduct.length > 0 &&
+                  tagProduct.map((item, index) => {
+                    return (
+                      <option key={index} value={item.nameEn}>
+                        {item.nameEn}
+                      </option>
+                    );
+                  })}
+              </Form.Select>
             </Col>
             <Col>
               {" "}
-              <Form.Label htmlFor="basic-url">category</Form.Label>
-              <InputGroup className="mb-3 ">
-                <Form.Control
-                  id="basic-url"
-                  aria-describedby="basic-addon3"
-                  name="category"
-                  disabled
-                />
-              </InputGroup>
+              <Form.Label htmlFor="basic-url">Open this select menu</Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="color"
+                onChange={handleOnChangeCategory}
+              >
+                {categories &&
+                  categories.length > 0 &&
+                  categories.map((item, index) => {
+                    return (
+                      <option key={index} value={item.cateKey}>
+                        {item.nameEn}
+                      </option>
+                    );
+                  })}
+              </Form.Select>
             </Col>
           </Row>
           <Button type="submit" variant="primary" onClick={handleCreateProduct}>
@@ -287,10 +399,11 @@ const AddProduct = () => {
               <th>ProductId</th>
               <th>Product name</th>
               <th>Quantity</th>
-              <th>Tag</th>
-              <th>Category</th>
               <th>Color</th>
               <th>Size</th>
+              <th>Type of customer</th>
+              <th>Tag</th>
+              <th>Category</th>
               <th>Image</th>
               <th>Description</th>
               <th>Edit</th>
@@ -298,12 +411,29 @@ const AddProduct = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
+            {productsReverse.map((item, index) => {
+              return (
+                <tr key={index + 1}>
+                  <td>{index}</td>
+                  <td>{item.productId}</td>
+                  <td>{item.nameProductEn}</td>
+                  <td>{item.quantity}</td>
+                  <td>
+                    {item.Colors.map((item, index) => {
+                      return <div key={index}>{item.nameEn}</div>;
+                    })}
+                  </td>
+                  <td>{item.sizeKeyMap}</td>
+                  <td>{item.Type_Customer.nameEn}</td>
+                  <td>{item.tagName}</td>
+                  <td>{item.Category.nameEn}</td>
+                  <td>{item.image}</td>
+                  <td>{item.desc}</td>
+                  <td>Edit</td>
+                  <td>Delete</td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </Container>

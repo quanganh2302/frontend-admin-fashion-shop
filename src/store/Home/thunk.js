@@ -50,3 +50,51 @@ export const fetchColor = () => async (dispatch) => {
     console.log(e);
   }
 };
+
+export const fetchSize = () => async (dispatch) => {
+  try {
+    let size = await homeServices.getSize();
+    dispatch({
+      type: actionTypes.FETCH_SIZE,
+      payload: size.size,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const fetchTypeCustomer = () => async (dispatch) => {
+  try {
+    let type = await homeServices.getType();
+    dispatch({
+      type: actionTypes.FETCH_TYPE,
+      payload: type.type,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const fetchCategories = () => async (dispatch) => {
+  try {
+    let cate = await homeServices.getCategories();
+    dispatch({
+      type: actionTypes.FETCH_CATEGORY,
+      payload: cate.cate,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const fetchTagProduct = () => async (dispatch) => {
+  try {
+    let tagProduct = await homeServices.getTagProduct();
+    dispatch({
+      type: actionTypes.FETCH_TAG_PRODUCT,
+      payload: tagProduct.tag,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};

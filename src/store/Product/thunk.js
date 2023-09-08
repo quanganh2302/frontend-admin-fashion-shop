@@ -46,11 +46,10 @@ export const createNewProduct = (data) => async (dispatch) => {
 export const fetchProduct = () => async (dispatch) => {
   try {
     let res = await productServices.handleFetchProduct();
-    console.log(res)
     if (res && res.errCode === 0) {
       dispatch({
         type: actionTypes.FETCH_PRODUCT_SUCCESS,
-        payload: res.data
+        payload: res.data,
       });
     } else {
       dispatch({
@@ -61,6 +60,24 @@ export const fetchProduct = () => async (dispatch) => {
     console.log(e);
     dispatch({
       type: actionTypes.FETCH_PRODUCT_FALSE,
+    });
+  }
+};
+
+export const createNewColor = (data) => async (dispatch) => {
+  try {
+    let res = await productServices.handleCreateNewColor(data);
+    if (res && res.errCode === 0) {
+      dispatch({ type: actionTypes.CREATE_NEW_COLOR_SUCCESS });
+    } else {
+      dispatch({
+        type: actionTypes.CREATE_NEW_COLOR_FALSE,
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    dispatch({
+      type: actionTypes.CREATE_NEW_COLOR_FALSE,
     });
   }
 };

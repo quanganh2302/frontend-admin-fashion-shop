@@ -6,6 +6,10 @@ const initialState = {
   gender: [],
   role: [],
   color: [],
+  size: [],
+  type: [],
+  categories: [],
+  tagProduct: [],
 };
 
 const homeReducer = (state = initialState, { type, payload }) => {
@@ -16,6 +20,14 @@ const homeReducer = (state = initialState, { type, payload }) => {
       draft.role = payload;
     } else if (type === actionTypes.FETCH_COLOR) {
       draft.color = payload;
+    } else if (type === actionTypes.FETCH_SIZE) {
+      draft.size = payload;
+    } else if (type === actionTypes.FETCH_TYPE) {
+      draft.type = payload;
+    } else if (type === actionTypes.FETCH_CATEGORY) {
+      draft.categories = payload;
+    } else if (type === actionTypes.FETCH_TAG_PRODUCT) {
+      draft.tagProduct = payload;
     }
     return draft;
   });
